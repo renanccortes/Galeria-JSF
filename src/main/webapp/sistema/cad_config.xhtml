@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"     xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:adm="http://github.com/adminfaces" xmlns:g="http://gecont.com.br/g"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="#{layoutMB.template}">
+
+
+    <!--        <ui:define name="head">
+                <title>Painel</title>
+            </ui:define>-->
+
+    <ui:define name="head-end"> 
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: left !important;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="body-begin">
+        <ui:param name="title" value="Configurações"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. --> 
+    </ui:define>
+
+    <ui:define name="description">
+        Configurações de Banco
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form prependId="false" id="formPisos">  
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"><em class="fa fa-wrench"><p:spacer width="10" /></em>Configuração</div>
+                <div class="panel-body"> 
+
+
+
+                    <div class="col-md-6"  >
+                        <h:commandButton  action="#{configuracaoBoletoMB.onEditar()}" class="btn btn-md btn-info" value="Editar">
+                            <p:ajax  update=":formCadastroConfig"/>
+                        </h:commandButton>
+
+                    </div>
+                    <br/>
+
+                    <p:spacer height="5" />
+                    <p:dataTable widgetVar="tabela" id="tabelaID" value="#{configuracaoBoletoMB.tabela}"  var="config" rows="20" paginator="false"
+                                 rowKey="#{config.hashCode()}"    
+                                 selection="#{configuracaoBoletoMB.config}" selectionMode="single" >
+
+                        <p:ajax event="rowSelect"   />
+                        <p:ajax event="sort"  update="tabelaID" oncomplete="PF('tabela').filter()" />
+
+                        <p:column headerText="Banco"  >
+                            <h:outputText value="#{config.banco.banco}"/>
+                        </p:column>
+
+                        <p:column headerText="Titular"  sortBy="#{config.banco.nomeBeneficiado}">
+                            <h:outputText value="#{config.banco.nomeBeneficiado}"/>
+                        </p:column>
+
+                        <p:column headerText="Agencia" >
+                            <h:outputText value="#{config.banco.agenciaNumero} - #{config.banco.agenciaDigito}"/>
+                        </p:column>
+
+                        <p:column headerText="Conta"   >
+                            <h:outputText value="#{config.banco.agenciaNumero} - #{config.banco.agenciaDigito}"> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Criado" sortBy="#{config.criado}" >
+                            <h:outputText value="#{config.criado}"> 
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Atualizado" sortBy="#{config.atualizado}" >
+                            <h:outputText value="#{config.atualizado}"> 
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+
+                    </p:dataTable>
+                </div>
+            </div>
+
+
+
+        </h:form>
+
+        <p:dialog id='cadastroPisoID' width="600" header="Configurações de Boleto"  modal="true" widgetVar="cadastroConfig">
+            <h:form id="formCadastroConfig">
+
+                <p:tabView>
+                    <p:tab title="Dados Banco">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Banco</label>
+                                <h:selectOneMenu class="form-control" value="#{configuracaoBoletoMB.config.banco}" converter="entityConverter"> 
+                                    <p:ajax event="change" update="formCadastroConfig" />
+                                    <f:selectItem itemValue="#{null}" itemLabel="Selecione" />
+                                    <f:selectItems value="#{configuracaoBoletoMB.bancos}" var="banco" itemValue="#{banco}" itemLabel="#{banco.banco}" />
+                                </h:selectOneMenu>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label>Agência</label>
+                                <h:inputText disabled="true" class="form-control" value="#{configuracaoBoletoMB.config.banco.agenciaNumero}" 
+                                             />
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Conta</label>
+                                <h:inputText disabled="true" class="form-control" value="#{configuracaoBoletoMB.config.banco.contaNumero}" 
+                                             />
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Doc Beneficiário</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.docBeneficiado}" 
+                                               required="true" requiredMessage="Digite o documento do beneficiário" a:placeholder="Documento do beneficiário"/>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nosso número</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.nossoNumero}" 
+                                               required="true" requiredMessage="Digite o nosso número" a:placeholder="Nosso número"/>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Titular</label>
+                                <h:inputText disabled="true" class="form-control" value="#{configuracaoBoletoMB.config.banco.nomeBeneficiado}" 
+                                             required="true" requiredMessage="Digite o nome o titular" a:placeholder="Digite o titular"/>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Dígito</label>
+                                <h:inputText disabled="true" class="form-control" value="#{configuracaoBoletoMB.config.banco.agenciaDigito}" size="5"
+                                             required="true" requiredMessage="Digite o digito da agência" a:placeholder="Digite o digito da agência"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Digito</label> 
+                                <h:inputText disabled="true" class="form-control" value="#{configuracaoBoletoMB.config.banco.contaDigito}" size="5"
+                                             required="true" requiredMessage="Digite o digito da conta" a:placeholder="Digite o digito da conta"/>
+                            </div> 
+
+                            <div class="form-group">
+                                <label>Carteira</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.carteira}" maxlength="3"
+                                               required="true" requiredMessage="Digite o número da carteira" a:placeholder="Número da carteira"/>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nosso número Dígito</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.nossoNumeroDigito}" 
+                                               required="true" requiredMessage="Digite o nosso número dígito" a:placeholder="Nosso número dígito"/>
+
+                            </div>
+
+                        </div>
+
+                    </p:tab>
+                    <p:tab title="Outros">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+
+                                <div class="form-group">
+                                    <label>Número documento</label>
+                                    <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.numeroDocumento}" 
+                                                   required="true" requiredMessage="Digite o número do documento" a:placeholder="Número do documento"/>
+
+                                </div> 
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Instrução de sacado</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.instrucaoSacado}" 
+                                               required="true" requiredMessage="Digite a instrução de sacado" a:placeholder="Instrução de sacado"/>
+
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Multa</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.multa}" 
+                                               converter="conversorNumero"
+                                               onkeypress="return mascaraMoeda(this, '.', ',', event)"
+                                               required="true" requiredMessage="Digite a multa" a:placeholder="Multa"/>
+
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-md-6">
+
+
+                            <div class="form-group">
+                                <label>Local pagamento</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.localPagamento}" 
+                                               required="true" requiredMessage="Digite o local pagamento" a:placeholder="Local pagamento"/>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Dias com antecêdencia</label>
+                                <h:inputText   class="form-control" value="#{configuracaoBoletoMB.config.diasAntecipadoParaGeracaoDeBoleto}" 
+                                               required="true" requiredMessage="Digite os dias com antecêdencia" a:placeholder="Dias"/>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Juros</label>
+                                <br/>
+                                <p:inputNumber symbol="%"   symbolPosition="s"    
+                                               value="#{configuracaoBoletoMB.config.taxaJuros}" emptyValue="zero"
+                                               required="true" requiredMessage="Digite os Juros" a:placeholder="Juros"/>
+
+                            </div>
+
+                        </div>
+
+
+
+
+                    </p:tab>
+                </p:tabView>
+
+                <br/>
+                <h:commandButton id="usersearchButton" value="Salvar" styleClass="btn btn-primary" action="#{configuracaoBoletoMB.onSalvar()}">
+                    <p:ajax process="@form"  update="formPisos, :formCadastroConfig, :msgGlobal" /> 
+                </h:commandButton>
+                <p:spacer width="15" />
+                <h:commandButton  onclick="PF('cadastroConfig').hide()" immediate="true" value="Cancelar" styleClass="btn btn-md btn-default"  >
+                    <f:ajax execute="@form" render="@form"  />
+                </h:commandButton> 
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+

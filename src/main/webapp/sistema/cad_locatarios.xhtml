@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"     xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:adm="http://github.com/adminfaces" xmlns:g="http://gecont.com.br/g"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="#{layoutMB.template}">
+
+
+    <!--        <ui:define name="head">
+                <title>Painel</title>
+            </ui:define>-->
+
+    <ui:define name="head-end"> 
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: left !important;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="body-begin">
+        <ui:param name="title" value="Locatários"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. --> 
+    </ui:define>
+
+    <ui:define name="description">
+        Cadastro de Locatários
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form prependId="false" id="formLocatarios">  
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"><em class="fa fa-user"><p:spacer width="10" /></em>Locatários Cadastrados</div>
+                <div class="panel-body"> 
+
+                    <div class="col-md-6">
+                        <h:commandButton value="Adicionar" action="#{locatarioMB.onNovo()}" class="btn btn-md btn-success"  >
+                            <p:ajax process="@form"  update=":formCadastroLocatario"  />
+                        </h:commandButton> 
+                    </div> 
+
+                    <div class="col-md-6" style="text-align: right">
+                        <h:commandButton  action="#{locatarioMB.onEditar()}" class="btn btn-md btn-info" value="Editar">
+                            <p:ajax  update=":formCadastroLocatario"/>
+                        </h:commandButton>
+
+                    </div>
+
+                    <p:spacer height="5" />
+                    <p:dataTable widgetVar="tabela" id="tabelaID" lazy="true" value="#{locatarioMB.tabela}"  var="locatario" rows="20" paginator="true"
+                                 rowKey="#{locatario.hashCode()}"
+                                 sortBy="#{locatario.nome}" 
+                                 sortOrder="descending"
+                                 emptyMessage="Nenhum locatário cadastrado"
+                                 paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                                 selection="#{locatarioMB.locatario}" selectionMode="single" >
+
+                        <p:ajax event="rowSelect"   />
+                        <p:ajax event="sort"  update="tabelaID" oncomplete="PF('tabela').filter()" />
+
+                        <p:column headerText="Nome"  sortBy="#{locatario.nome}">
+                            <h:outputText value="#{locatario.nome}"/>
+                        </p:column>
+                        <p:column headerText="Nome Fantasia"  sortBy="#{locatario.nomeFantasia}" >
+                            <h:outputText value="#{locatario.nomeFantasia}"/>
+                        </p:column>
+
+                        <p:column headerText="Telefone"   >
+                            <h:outputText value="#{locatario.telefone}"/>
+                        </p:column>
+
+                        <p:column headerText="E-mail"    >
+                            <h:outputText value="#{locatario.email}"/>
+                        </p:column>
+
+                        <p:column headerText="Endereço"    >
+                            <h:outputText value="#{locatario.endereco.toString()}"/>
+                        </p:column>
+
+                        <p:column headerText="Criado" sortBy="#{locatario.created}" >
+                            <h:outputText value="#{locatario.created}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Atualizado" sortBy="#{locatario.updated}" >
+                            <h:outputText value="#{locatario.updated}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Status"  sortBy="#{locatario.status}" >
+                            <h:outputText value="#{locatario.status}"/> 
+                        </p:column>
+
+                    </p:dataTable>
+                </div>
+            </div>
+
+
+
+        </h:form>
+
+        <p:dialog id='cadastroLocatarioID' width="600" header="Cadastro de Locatário"  modal="true" widgetVar="cadastroLocatario">
+            <h:form id="formCadastroLocatario">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Dados</div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label>Nome</label>
+                                <h:inputText class="form-control" value="#{locatarioMB.locatario.nome}" 
+                                             required="true" requiredMessage="Digite o nome do locatário" a:placeholder="Digite o nome"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nome Fantasia</label>
+                                <h:inputText class="form-control" value="#{locatarioMB.locatario.nomeFantasia}" 
+                                             a:placeholder="Digite o nome fantasia"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Documento</label>
+                                <h:inputText class="form-control" value="#{locatarioMB.locatario.documento}" 
+                                             a:placeholder="Digite o documento"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Responsável</label>
+                                <h:inputText class="form-control" value="#{locatarioMB.locatario.responsavel}" 
+                                             a:placeholder="Digite o responsável"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Telefone</label>
+                                <h:inputText class="form-control" value="#{locatarioMB.locatario.telefone}" 
+                                             a:placeholder="Digite o telefone"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>E-mail</label>
+                                <h:inputText class="form-control" value="#{locatarioMB.locatario.email}" 
+                                             a:placeholder="Digite o e-mail"/>
+                            </div>
+ 
+
+                            <div class="form-group">
+                                <label>Status</label>
+                                <h:selectOneMenu class="form-control" value="#{locatarioMB.locatario.status}">
+                                    <f:selectItem  itemValue="#{true}" itemLabel="Ativo" />
+                                    <f:selectItem  itemValue="#{false}" itemLabel="Inativo" />
+                                </h:selectOneMenu>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <h:commandButton id="usersearchButton" value="Salvar" styleClass="btn btn-primary" action="#{locatarioMB.onSalvar()}">
+                    <p:ajax process="@form"  update=":formLocatarios, :formCadastroLocatario, :msgGlobal" /> 
+                </h:commandButton>
+                <p:spacer width="15" />
+                <h:commandButton  onclick="PF('cadastroLocatario').hide()" immediate="true" value="Cancelar" styleClass="btn btn-md btn-default"  >
+                    <f:ajax execute="@form" render="@form"  />
+                </h:commandButton> 
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+

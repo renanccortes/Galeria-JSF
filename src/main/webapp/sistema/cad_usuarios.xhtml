@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"     xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:adm="http://github.com/adminfaces" xmlns:g="http://gecont.com.br/g"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="#{layoutMB.template}">
+
+
+    <!--        <ui:define name="head">
+                <title>Painel</title>
+            </ui:define>-->
+
+    <ui:define name="head-end"> 
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: left !important;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="body-begin">
+        <ui:param name="title" value="Usuários"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. --> 
+    </ui:define>
+
+    <ui:define name="description">
+        Cadastro de Usuários
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form prependId="false" id="formusuarios">  
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"><em class="fa fa-users"><p:spacer width="10" /></em>Usuários Cadastrados</div>
+                <div class="panel-body"> 
+
+                    <div class="col-md-6">
+                        <h:commandButton value="Adicionar" action="#{usuarioMB.onNovo()}" class="btn btn-md btn-success"  >
+                            <p:ajax process="@form"  update=":formCadastroUsuario"  />
+                        </h:commandButton> 
+                    </div> 
+
+                    <div class="col-md-6" style="text-align: right">
+                        <h:commandButton  action="#{usuarioMB.onEditar()}" class="btn btn-md btn-info" value="Editar">
+                            <p:ajax  update=":formCadastroUsuario"/>
+                        </h:commandButton>
+
+                    </div>
+
+                    <p:spacer height="5" />
+                    <p:dataTable widgetVar="tabela" id="tabelaID" lazy="true" value="#{usuarioMB.tabela}"  var="usuario" rows="20" paginator="true"
+                                 rowKey="#{usuario.hashCode()}"
+                                 sortBy="#{usuario.nome}" 
+                                 sortOrder="descending"
+                                 emptyMessage="Nenhum piso cadastrado"
+                                 paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                                 selection="#{usuarioMB.usuario}" selectionMode="single" >
+
+                        <p:ajax event="rowSelect"   />
+                        <p:ajax event="sort"  update="tabelaID" oncomplete="PF('tabela').filter()" />
+
+                        <p:column headerText="Nome"  sortBy="#{usuario.nome}">
+                            <h:outputText value="#{usuario.nome}"/>
+                        </p:column>
+                        <p:column headerText="E-mail"  sortBy="#{usuario.email}" >
+                            <h:outputText value="#{usuario.email}"> 
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Tipo do Usuário"  sortBy="#{usuario.tipoUsuario}" >
+                            <h:outputText value="#{usuario.tipoUsuario}"> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Login"  sortBy="#{usuario.login.login}" >
+                            <h:outputText value="#{usuario.login.login}"> 
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Criado" sortBy="#{usuario.criado}" >
+                            <h:outputText value="#{usuario.criado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Atualizado" sortBy="#{usuario.atualizado}" >
+                            <h:outputText value="#{usuario.atualizado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+
+                        <p:column headerText="Status"  sortBy="#{usuario.login.ativo}" >
+                            <h:outputText value="#{usuario.login.ativo}"/> 
+                        </p:column>
+
+
+
+                    </p:dataTable>
+                </div>
+            </div>
+
+
+
+        </h:form>
+
+        <p:dialog id='cadastroPisoID' width="600" header="Cadastro de Usuário"  modal="true" widgetVar="cadastroUsuario">
+            <h:form id="formCadastroUsuario">
+
+
+
+                <p:tabView>
+                    <p:tab title="Dados Usuário">
+                        <div class="panel-body">
+                            <div class="col-md-6">
+
+                                <div class="form-group">
+                                    <label>Nome</label>
+                                    <h:inputText class="form-control" value="#{usuarioMB.usuario.nome}" 
+                                                 required="true" requiredMessage="Digite o nome do usuário" a:placeholder="Digite o nome"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Login</label>
+                                    <h:inputText class="form-control" value="#{usuarioMB.usuario.login.login}" 
+                                                 required="true" requiredMessage="Digite o login do usuário" a:placeholder="Digite o login"/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>E-mail</label>
+                                    <h:inputText class="form-control" value="#{usuarioMB.usuario.email}" 
+                                                 required="true" requiredMessage="Digite o e-mail do usuário" a:placeholder="Digite oa e-mail"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Senha</label>
+                                    <h:inputSecret class="form-control" value="#{usuarioMB.usuario.login.senha}" 
+                                                   required="true" requiredMessage="Digite a senha do usuário" a:placeholder="Digite oa senha"/>
+                                </div>
+                            </div>
+                        </div>
+                    </p:tab>
+                    <p:tab title="Permissões">
+
+                        <div class="panel-body">
+                            <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <label>Selecione um Perfil</label>
+                                    <p:selectOneMenu value="#{usuarioMB.perfilSelecionado}" converter="entityConverter" style="width: 300px;"> 
+                                        <p:ajax listener="#{usuarioMB.onSelecionarPerfil()}" update="panelArvore" />
+                                        <f:selectItem noSelectionOption="true" itemLabel="Perfis de Usuário" itemValue="#{null}"/>
+                                        <f:selectItems value="#{usuarioMB.perfisCadastrados}" var="perfil" itemLabel="#{perfil.nome}" itemValue="#{perfil}" />
+                                    </p:selectOneMenu> 
+                                </div>
+
+                                <p:panel id="panelArvore" header="Habilitar Ações de Usuário do Sistema">
+                                    <div style="width: 100%; height: 200px; overflow-y: scroll;">
+
+                                        <p:tree value="#{usuarioMB.root}" var="node" 
+                                                showUnselectableCheckbox="true" dynamic="true" 
+                                                selection="#{usuarioMB.nosSelecionados}" selectionMode="checkbox">
+
+                                            <p:ajax event="select" listener="#{usuarioMB.onNodeSelect}" />
+                                            <p:ajax event="unselect" listener="#{usuarioMB.onNodeUnselect}" />
+
+                                            <p:treeNode   type="menu">
+                                                <h:outputText value="#{node.label}" />
+                                            </p:treeNode>
+                                            <p:treeNode   type="item">
+                                                <h:outputText value="#{node.label}" />
+                                            </p:treeNode>
+                                            <p:treeNode   type="acao">
+                                                <h:outputText value="#{node.label}" />
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </div>
+                                </p:panel>
+
+                            </div>
+                        </div>
+
+
+                    </p:tab>
+                </p:tabView>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <h:selectOneMenu class="form-control" value="#{usuarioMB.usuario.login.ativo}">
+                        <f:selectItem  itemValue="#{true}" itemLabel="Ativo" />
+                        <f:selectItem  itemValue="#{false}" itemLabel="Inativo" />
+                    </h:selectOneMenu>
+                </div>
+
+
+                <h:commandButton id="usersearchButton" value="Salvar" styleClass="btn btn-primary" action="#{usuarioMB.onSalvar()}">
+                    <p:ajax process="@form"  update="formusuarios, :formCadastroUsuario, :msgGlobal" /> 
+                </h:commandButton>
+                <p:spacer width="15" />
+                <h:commandButton  onclick="PF('cadastroUsuario').hide()" immediate="true" value="Cancelar" styleClass="btn btn-md btn-default"  >
+                    <f:ajax execute="@form" render="@form"  />
+                </h:commandButton> 
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+

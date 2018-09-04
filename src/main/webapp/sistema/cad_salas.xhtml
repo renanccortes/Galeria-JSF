@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"     xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:adm="http://github.com/adminfaces" xmlns:g="http://gecont.com.br/g"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="#{layoutMB.template}">
+
+
+    <!--        <ui:define name="head">
+                <title>Painel</title>
+            </ui:define>-->
+
+    <ui:define name="head-end"> 
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: left !important;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="body-begin">
+        <ui:param name="title" value="Salas"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. --> 
+    </ui:define>
+
+    <ui:define name="description">
+        Cadastro de Salas
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form prependId="false" id="formSalas">  
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"><em class="fa fa-building"><p:spacer width="10" /></em>Salas Cadastradas</div>
+                <div class="panel-body"> 
+
+                    <div class="col-md-6">
+                        <h:commandButton value="Adicionar" action="#{salaMB.onNovo()}" class="btn btn-md btn-success"  >
+                            <p:ajax process="@form"  update=":formCadastroSala"  />
+                        </h:commandButton> 
+                    </div> 
+
+                    <div class="col-md-6" style="text-align: right">
+                        <h:commandButton  action="#{salaMB.onEditar()}" class="btn btn-md btn-info" value="Editar">
+                            <p:ajax  update=":formCadastroSala"/>
+                        </h:commandButton>
+
+                    </div>
+
+                    <p:spacer height="5" />
+                    <p:dataTable widgetVar="tabela" id="tabelaID" lazy="true" value="#{salaMB.tabela}"  var="sala" rows="20" paginator="true"
+                                 rowKey="#{sala.hashCode()}"
+                                 sortBy="#{sala.numero}" 
+                                 sortOrder="descending"
+                                 emptyMessage="Nenhum piso cadastrado"
+                                 paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                                 selection="#{salaMB.sala}" selectionMode="single" >
+
+                        <p:ajax event="rowSelect"   />
+                        <p:ajax event="sort"  update="tabelaID" oncomplete="PF('tabela').filter()" />
+
+                        <p:column headerText="Número"  sortBy="#{sala.numero}">
+                            <h:outputText value="#{sala.numero}"/>
+                        </p:column>
+                        <p:column headerText="Metros"  sortBy="#{sala.metros}" >
+                            <h:outputText value="#{sala.metros}"/>
+                        </p:column>
+
+                        <p:column headerText="Fração"  sortBy="#{sala.fracao}" >
+                            <h:outputText value="#{sala.fracao}"/>
+                        </p:column>
+
+                        <p:column headerText="Piso"  sortBy="#{sala.piso.descricao}" >
+                            <h:outputText value="#{sala.piso.descricao}"/>
+                        </p:column>
+
+                        <p:column headerText="Atualizado" sortBy="#{sala.atualizado}" >
+                            <h:outputText value="#{sala.atualizado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Status"  sortBy="#{sala.status}" >
+                            <h:outputText value="#{sala.status}"/> 
+                        </p:column>
+
+                    </p:dataTable>
+                </div>
+            </div>
+
+
+
+        </h:form>
+
+        <p:dialog id='cadastroPisoID' width="600" header="Cadastro de Sala"  modal="true" widgetVar="cadastroSala">
+            <h:form id="formCadastroSala">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Dados</div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label>Nome</label>
+                                <h:inputText class="form-control" value="#{salaMB.sala.nome}" 
+                                             required="true" requiredMessage="Digite o nome da sala" a:placeholder="Digite o nome"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Número</label>
+                                <h:inputText onkeypress="validateInput('[0-9]*')" class="form-control" value="#{salaMB.sala.numero}" 
+                                             required="true" requiredMessage="Digite o número da sala" a:placeholder="Digite o número"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Metros</label>
+                                <br/>
+                                <p:inputNumber   value="#{salaMB.sala.metros}" 
+                                             required="true" requiredMessage="Digite a metragem da sala" a:placeholder="Digite a metragem"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Fração</label>
+                                <br/>
+                                <p:inputNumber   symbol="%"  symbolPosition="s"   value="#{salaMB.sala.fracao}" 
+                                             required="true" requiredMessage="Digite a fração da sala" a:placeholder="Digite a fração"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Piso</label>
+                                <h:selectOneMenu class="form-control" value="#{salaMB.sala.piso}" converter="entityConverter">
+                                    <f:selectItems value="#{salaMB.pisosCadastrados}" var="piso" itemLabel="#{piso.descricao}" itemValue="#{piso}" />
+                                </h:selectOneMenu>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Status</label>
+                                <h:selectOneMenu class="form-control" value="#{salaMB.sala.status}">
+                                    <f:selectItem  itemValue="#{true}" itemLabel="Ativo" />
+                                    <f:selectItem  itemValue="#{false}" itemLabel="Inativo" />
+                                </h:selectOneMenu>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <h:commandButton id="usersearchButton" value="Salvar" styleClass="btn btn-primary" action="#{salaMB.onSalvar()}">
+                    <p:ajax process="@form"  update=":formSalas, :formCadastroSala, :msgGlobal" /> 
+                </h:commandButton>
+                <p:spacer width="15" />
+                <h:commandButton  onclick="PF('cadastroSala').hide()" immediate="true" value="Cancelar" styleClass="btn btn-md btn-default"  >
+                    <f:ajax execute="@form" render="@form"  />
+                </h:commandButton> 
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+

@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"     xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:adm="http://github.com/adminfaces" xmlns:g="http://gecont.com.br/g"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="#{layoutMB.template}">
+
+
+    <!--        <ui:define name="head">
+                <title>Painel</title>
+            </ui:define>-->
+
+    <ui:define name="head-end"> 
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: left !important;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="body-begin">
+        <ui:param name="title" value="Bancos"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. --> 
+    </ui:define>
+
+    <ui:define name="description">
+        Cadastro de Bancos
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form prependId="false" id="formBanco">  
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"><em class="fa fa-bank"><p:spacer width="10" /></em>Bancos Cadastrados</div>
+                <div class="panel-body"> 
+
+                    <div class="col-md-6">
+                        <p:commandButton value="Adicionar" action="#{bancoMB.onNovo()}" class="btn btn-md btn-success"  >  
+                        </p:commandButton> 
+                    </div> 
+
+                    <div class="col-md-6" style="text-align: right">
+                        <h:commandButton  action="#{bancoMB.onEditar()}" class="btn btn-md btn-info" value="Editar">
+                            <p:ajax  update=":formCadastroBancos"/>
+                        </h:commandButton>
+
+                    </div>
+
+                    <p:spacer height="5" />
+                    <p:dataTable widgetVar="tabela" id="tabelaID" lazy="true" value="#{bancoMB.tabela}"  var="banco" rows="20" paginator="true"
+                                 rowKey="#{bancoMB.hashCode()}" 
+                                 sortOrder="ascending"
+                                 emptyMessage="Nenhum banco cadastrado"
+                                 paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                                 selection="#{bancoMB.banco}" selectionMode="single" >
+
+                        <p:ajax event="rowSelect"   />
+                        <p:ajax event="sort"  update="tabelaID" oncomplete="PF('tabela').filter()" />
+
+                        <p:column headerText="Titular"   >
+                            <h:outputText value="#{banco.nomeBeneficiado}"/>
+                        </p:column>
+
+                        <p:column headerText="Banco"  sortBy="#{banco.banco}">
+                            <h:outputText value="#{banco.banco}"/>
+                        </p:column>
+                        <p:column headerText="Agência"   >
+                            <h:outputText value="#{banco.agenciaNumero} - #{banco.agenciaDigito}"/>
+                        </p:column>
+                        <p:column headerText="Conta"   >
+                            <h:outputText value="#{banco.contaNumero} - #{banco.contaDigito}"/>
+                        </p:column>
+
+<!--                        <p:column headerText="Status"  sortBy="#{piso.status}" >
+                            <h:outputText value="#{piso.status}"/> 
+                        </p:column>-->
+
+                    </p:dataTable>
+                </div>
+            </div>
+
+
+
+        </h:form>
+
+        <p:dialog id='cadastroBancoID' width="600" header="Cadastro de Banco"  modal="true" widgetVar="cadastroBanco">
+            <h:form id="formCadastroBancos">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Dados</div>
+                    <div class="panel-body">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label>Titular</label>
+                                <h:inputText class="form-control" value="#{bancoMB.banco.nomeBeneficiado}" 
+                                             required="true" requiredMessage="Digite o nome o titular" a:placeholder="Digite o titular"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Agência</label>
+                                <h:inputText class="form-control" value="#{bancoMB.banco.agenciaNumero}" maxlength="4" 
+                                             required="true" requiredMessage="Digite o número da agência" a:placeholder="Digite o número da agência"/>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Conta</label>
+                                <h:inputText class="form-control" value="#{bancoMB.banco.contaNumero}" 
+                                             required="true" requiredMessage="Digite o número da conta" a:placeholder="Digite o número da conta"/>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label>Banco</label>
+                                <h:selectOneMenu class="form-control" value="#{bancoMB.banco.banco}"> 
+                                    <f:selectItems value="#{bancoMB.bancosEnum}" var="banco" itemValue="#{banco}" itemLabel="#{banco.toString()}"  />
+                                </h:selectOneMenu>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Dígito</label>
+                                <h:inputText class="form-control" value="#{bancoMB.banco.agenciaDigito}" size="5"
+                                             required="true" requiredMessage="Digite o digito da agência" a:placeholder="Digite o digito da agência"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Digito</label> 
+                                <h:inputText class="form-control" value="#{bancoMB.banco.contaDigito}" size="5"
+                                             required="true" requiredMessage="Digite o digito da conta" a:placeholder="Digite o digito da conta"/>
+                            </div>
+
+
+
+
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <h:selectOneMenu class="form-control" value="#{bancoMB.banco.status}">
+                                <f:selectItem  itemValue="#{true}" itemLabel="Ativo" />
+                                <f:selectItem  itemValue="#{false}" itemLabel="Inativo" />
+                            </h:selectOneMenu>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <h:commandButton id="usersearchButton" value="Salvar" styleClass="btn btn-primary" action="#{bancoMB.onSalvar()}">
+                    <p:ajax process="@form"  update="formBanco, :formCadastroBancos, :msgGlobal" /> 
+                </h:commandButton>
+                <p:spacer width="15" />
+                <h:commandButton  onclick="PF('cadastroBanco').hide()" immediate="true" value="Cancelar" styleClass="btn btn-md btn-default"  >
+                    <f:ajax execute="@form" render="@form"  />
+                </h:commandButton> 
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+

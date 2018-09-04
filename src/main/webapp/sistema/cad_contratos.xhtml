@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"     xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:adm="http://github.com/adminfaces" xmlns:g="http://gecont.com.br/g"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="#{layoutMB.template}">
+
+
+    <!--        <ui:define name="head">
+                <title>Painel</title>
+            </ui:define>-->
+
+    <ui:define name="head-end"> 
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: left !important;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="body-begin">
+        <ui:param name="title" value="Contratos"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. --> 
+    </ui:define>
+
+    <ui:define name="description">
+        Cadastro de Locatários
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form prependId="false" id="formContratos">  
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"><em class="fa fa-copy"><p:spacer width="10" /></em>Contratos Cadastrados</div>
+                <div class="panel-body"> 
+
+                    <div class="col-md-6">
+                        <h:commandButton value="Adicionar" action="#{contratoMB.onNovo()}" class="btn btn-md btn-success"  >
+                            <p:ajax process="@form"  update=":formCadastroContrato"  />
+                        </h:commandButton> 
+                    </div> 
+
+                    <div class="col-md-6" style="text-align: right">
+                        <h:commandButton  action="#{contratoMB.onEditar()}" class="btn btn-md btn-info" value="Editar">
+                            <p:ajax  update=":formCadastroContrato"/>
+                        </h:commandButton>
+
+                    </div>
+
+                    <p:spacer height="5" />
+                    <p:dataTable widgetVar="tabela" id="tabelaLocatarios" lazy="true" value="#{contratoMB.tabela}"  var="contrato" rows="20" paginator="true"
+                                 rowKey="#{contratoMB.hashCode()}"
+                                 sortBy="#{contrato.inicio}" 
+                                 sortOrder="descending"
+                                 emptyMessage="Nenhum contrato cadastrado"
+                                 paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                                 selection="#{contratoMB.contrato}" selectionMode="single" >
+
+                        <p:ajax event="rowSelect"   />
+                        <p:ajax event="sort"  update="tabelaLocatarios" oncomplete="PF('tabela').filter()" />
+
+                        <p:column headerText="Nome Locatário"  sortBy="#{contrato.locatario.nome}">
+                            <h:outputText value="#{contrato.locatario.nome}"/>
+                        </p:column>
+                        <p:column headerText="Fiador"  sortBy="#{contrato.fiador}" >
+                            <h:outputText value="#{contrato.fiador}"/>
+                        </p:column>
+
+                        <p:column headerText="Sala"   >
+                            <h:outputText value="#{contrato.sala.numero}"/>
+                        </p:column>
+
+                        <p:column headerText="Piso"    >
+                            <h:outputText value="#{contrato.sala.piso.descricao}"/>
+                        </p:column>
+
+                        <p:column headerText="Dia do Vencimento"    >
+                            <h:outputText value="#{contrato.diaVencimento}"/>
+                        </p:column>
+
+                        <p:column headerText="Validade" sortBy="#{contrato.validade}" >
+                            <h:outputText value="#{contrato.validade}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Último Ajuste" sortBy="#{contrato.ultimoAjuste}" >
+                            <h:outputText value="#{contrato.ultimoAjuste}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Criado" sortBy="#{contrato.criado}" >
+                            <h:outputText value="#{contrato.criado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Atualizado" sortBy="#{contrato.atualizado}" >
+                            <h:outputText value="#{contrato.atualizado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Status"  sortBy="#{contrato.status}" >
+                            <h:outputText value="#{contrato.status}"/> 
+                        </p:column>
+
+                    </p:dataTable>
+                </div>
+            </div>
+
+
+
+        </h:form>
+
+        <p:dialog id='cadastroLocatarioID' width="600" header="Cadastro de Locatário"  modal="true" widgetVar="cadastroContrato">
+            <h:form id="formCadastroContrato">
+
+                <p:tabView>
+                    <p:tab title="Contratante">
+                        <p:commandButton value="Incluir" oncomplete="PF('incluirLocatario').show();" />
+                        <br/>
+                        <p:tabView>
+                            <p:tab title="Dados Contratante">
+                                <div class="panel-body">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Fiador</label>
+                                            <h:inputText class="form-control" value="#{contratoMB.contrato.fiador}" disabled="false"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+                                            <label>Nome</label>
+                                            <h:inputText class="form-control" value="#{contratoMB.contrato.locatario.nome}" 
+                                                         disabled="true"/>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Telefone</label>
+                                            <h:inputText class="form-control" value="#{contratoMB.contrato.locatario.telefone}" 
+                                                         disabled="true"/>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Nome Fantasia</label>
+                                            <h:inputText class="form-control" value="#{contratoMB.contrato.locatario.nomeFantasia}" disabled="true"/>
+                                        </div> 
+
+                                        <div class="form-group">
+                                            <label>E-mail</label>
+                                            <h:inputText class="form-control" value="#{contratoMB.contrato.locatario.email}" disabled="true"/>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </p:tab>
+
+                            <p:tab title="Endereço">
+                                <div class="panel-body">
+                                    <div class="col-md-6">
+
+                                    </div>
+                                </div> 
+                            </p:tab>
+                        </p:tabView>
+
+
+                    </p:tab>
+                    <p:tab title="Dados Contrato">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Contrato</div>
+                            <div class="panel-body">
+                                <div class="col-md-6">
+
+                                    <div class="form-group">
+                                        <label>Piso</label>
+                                        <h:selectOneMenu class="form-control" value="#{contratoMB.contrato.piso}" converter="entityConverter">
+                                            <p:ajax event="change" update="cbSala" />
+                                            <f:selectItem itemValue="#{null}" itemLabel="Selecione" />
+                                            <f:selectItems value="#{contratoMB.pisosCadastrados}" var="piso" itemLabel="#{piso.descricao}" itemValue="#{piso}" />
+                                        </h:selectOneMenu>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Atividade</label>
+                                        <h:inputText class="form-control" value="#{contratoMB.contrato.atividade}" required="false" />
+                                    </div> 
+
+
+                                    <div class="form-group">
+                                        <label>Início Contrato</label> 
+                                        <p:calendar pattern="dd/MM/yyyy" size="9"  readonlyInput="false" value="#{contratoMB.contrato.inicio}"/>  
+                                    </div> 
+                                    
+                                    <div class="form-group">
+                                        <label>Valor</label>
+                                        <h:inputText class="form-control" value="#{contratoMB.contrato.valor}" required="true" 
+                                                     requiredMessage="Digite o valor do contrato"  disabled="false"/>
+                                    </div> 
+
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Sala</label>
+                                        <h:selectOneMenu id="cbSala" class="form-control" value="#{contratoMB.contrato.sala}" converter="entityConverter">
+                                            <f:selectItem itemValue="#{null}" itemLabel="Selecione" />
+                                            <f:selectItems value="#{contratoMB.contrato.piso.salas}" var="sala" itemLabel="#{sala.numero}" itemValue="#{sala}" />
+                                        </h:selectOneMenu>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Dia de Vencimento</label>
+                                        <h:inputText class="form-control" value="#{contratoMB.contrato.diaVencimento}" required="true" 
+                                                     requiredMessage="Digite o dia do vencimento" disabled="false"/>
+                                    </div> 
+
+                                </div>
+                            </div>
+                        </div>
+                    </p:tab>
+
+                </p:tabView>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <h:selectOneMenu class="form-control" value="#{contratoMB.contrato.status}">
+                        <f:selectItem  itemValue="#{true}" itemLabel="Ativo" />
+                        <f:selectItem  itemValue="#{false}" itemLabel="Inativo" />
+                    </h:selectOneMenu>
+                </div>
+
+                <h:commandButton id="usersearchButton" value="Salvar" styleClass="btn btn-primary" action="#{contratoMB.onSalvar()}">
+                    <p:ajax process="@form"  update=":formContratos, :formCadastroContrato, :msgGlobal" /> 
+                </h:commandButton>
+                <p:spacer width="15" />
+                <h:commandButton  onclick="PF('cadastroContrato').hide()" immediate="true" value="Cancelar" styleClass="btn btn-md btn-default"  >
+                    <f:ajax execute="@form" render="@form"  />
+                </h:commandButton> 
+
+            </h:form>
+
+        </p:dialog>
+
+        <p:dialog widgetVar="incluirLocatario" width="800">
+            <h:form>
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Locatários Cadastrados</div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+                            <p:dataTable widgetVar="tabela" id="tabelaID" lazy="true" value="#{locatarioMB.tabela}"  var="locatario" rows="20" paginator="true"
+                                         rowKey="#{locatario.hashCode()}"
+                                         sortBy="#{locatario.nome}" 
+                                         sortOrder="descending"
+                                         emptyMessage="Nenhum locatário cadastrado"
+                                         paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                                         selection="#{contratoMB.contrato.locatario}" selectionMode="single" >
+
+                                <p:ajax event="rowSelect"   />
+                                <p:ajax event="sort"  update="tabelaID" oncomplete="PF('tabela').filter()" />
+
+                                <p:column headerText="Nome"  sortBy="#{locatario.nome}">
+                                    <h:outputText value="#{locatario.nome}"/>
+                                </p:column>
+                                <p:column headerText="Nome Fantasia"  sortBy="#{locatario.nomeFantasia}" >
+                                    <h:outputText value="#{locatario.nomeFantasia}"/>
+                                </p:column>
+
+                                <p:column headerText="Telefone"   >
+                                    <h:outputText value="#{locatario.telefone}"/>
+                                </p:column>
+
+                                <p:column headerText="E-mail"    >
+                                    <h:outputText value="#{locatario.email}"/>
+                                </p:column>
+
+                                <p:column headerText="Endereço"    >
+                                    <h:outputText value="#{locatario.endereco.toString()}"/>
+                                </p:column>
+
+                                <p:column headerText="Criado" sortBy="#{locatario.created}" >
+                                    <h:outputText value="#{locatario.created}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Atualizado" sortBy="#{locatario.updated}" >
+                                    <h:outputText value="#{locatario.updated}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                                    </h:outputText>
+                                </p:column>
+
+                                <p:column headerText="Status"  sortBy="#{locatario.status}" >
+                                    <h:outputText value="#{locatario.status}"/> 
+                                </p:column>
+
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+                <p:commandButton value="Incluir" update=":formCadastroContrato" oncomplete="PF('incluirLocatario').hide();" />
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+

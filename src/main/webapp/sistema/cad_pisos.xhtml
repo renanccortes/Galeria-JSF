@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"     xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:adm="http://github.com/adminfaces" xmlns:g="http://gecont.com.br/g"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core" xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="#{layoutMB.template}">
+
+
+    <!--        <ui:define name="head">
+                <title>Painel</title>
+            </ui:define>-->
+
+    <ui:define name="head-end"> 
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: left !important;
+            }
+
+        </style>
+    </ui:define>
+
+    <ui:define name="body-begin">
+        <ui:param name="title" value="Pisos"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. --> 
+    </ui:define>
+
+    <ui:define name="description">
+        Cadastro de Pisos
+    </ui:define>
+
+    <ui:define name="body">
+
+        <h:form prependId="false" id="formPisos">  
+
+            <div class="panel panel-primary">
+                <div class="panel-heading"><em class="fa fa-align-justify"><p:spacer width="10" /></em>Pisos Cadastrados</div>
+                <div class="panel-body"> 
+
+                    <div class="col-md-6">
+
+                        <p:commandButton   value="Adicionar" action="#{pisoMB.onNovo()}" class="btn btn-md btn-success"  >  
+                        </p:commandButton> 
+                    </div> 
+
+                    <div class="col-md-6" style="text-align: right">
+                        <h:commandButton  action="#{pisoMB.onEditar()}" class="btn btn-md btn-info" value="Editar">
+                            <p:ajax  update=":formCadastroPiso"/>
+                        </h:commandButton>
+
+                    </div>
+
+                    <p:spacer height="5" />
+                    <p:dataTable widgetVar="tabela" id="tabelaID" lazy="true" value="#{pisoMB.tabela}"  var="piso" rows="20" paginator="true"
+                                 rowKey="#{piso.hashCode()}"
+                                 sortBy="#{piso.descricao}" 
+                                 sortOrder="descending"
+                                 emptyMessage="Nenhum piso cadastrado"
+                                 paginatorAlwaysVisible="false" paginatorPosition="bottom"
+                                 selection="#{pisoMB.piso}" selectionMode="single" >
+
+                        <p:ajax event="rowSelect"   />
+                        <p:ajax event="sort"  update="tabelaID" oncomplete="PF('tabela').filter()" />
+
+                        <p:column headerText="Andar"  sortBy="#{piso.descricao}">
+                            <h:outputText value="#{piso.descricao}"/>
+                        </p:column>
+                        <p:column headerText="Criado"  sortBy="#{piso.criado}" >
+                            <h:outputText value="#{piso.criado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Atualizado" sortBy="#{piso.atualizado}" >
+                            <h:outputText value="#{piso.atualizado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="pt" timeZone="America/Sao_Paulo" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Status"  sortBy="#{piso.status}" >
+                            <h:outputText value="#{piso.status}"/> 
+                        </p:column>
+
+                    </p:dataTable>
+                </div>
+            </div>
+ 
+        </h:form>
+
+        <p:dialog id='cadastroPisoID' width="600" header="Cadastro de Piso"  modal="true" widgetVar="cadastroPiso">
+            <h:form id="formCadastroPiso">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Dados</div>
+                    <div class="panel-body">
+                        <div class="col-md-12">
+
+                            <div class="form-group">
+                                <label>Piso</label>
+                                <h:inputText class="form-control" value="#{pisoMB.piso.nome}" 
+                                             required="true" requiredMessage="Digite o nome o piso" a:placeholder="Digite o piso"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Descrição</label>
+                                <h:inputTextarea cols="30" rows="6" class="form-control" value="#{pisoMB.piso.descricao}" 
+                                                 a:placeholder="Descrição"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Status</label>
+                                <h:selectOneMenu class="form-control" value="#{pisoMB.piso.status}">
+                                    <f:selectItem  itemValue="#{true}" itemLabel="Ativo" />
+                                    <f:selectItem  itemValue="#{false}" itemLabel="Inativo" />
+                                </h:selectOneMenu>
+                            </div>
+
+                            <!--                            <div class="form-group">
+                                                            <label>Observações</label>
+                                                            <h:inputTextarea class="form-control" rows="4" value="#{camposMB.campo.obs}"/> 
+                                                        </div>-->
+
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                <h:commandButton id="usersearchButton" value="Salvar" styleClass="btn btn-primary" action="#{pisoMB.onSalvar()}">
+                    <p:ajax process="@form"  update="formPisos, :formCadastroPiso, :msgGlobal" /> 
+                </h:commandButton>
+                <p:spacer width="15" />
+                <h:commandButton  onclick="PF('cadastroPiso').hide()" immediate="true" value="Cancelar" styleClass="btn btn-md btn-default"  >
+                    <f:ajax execute="@form" render="@form"  />
+                </h:commandButton> 
+
+            </h:form>
+
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+
+
