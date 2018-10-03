@@ -54,7 +54,7 @@ public class EmailSenderImpl implements EmailSender {
         login.setSenha("1234");
         usuario.setLogin(login);
 
-        conteudo.configuraDados(usuario, "Acesso a usualsystem", "renanccortes@gmail.com");
+        conteudo.configuraDados(usuario, "ASSUNTO", "EMAIL DESTINO");
         try {
             e.enviarEmail(conteudo);
         } catch (MessagingException ex) {
@@ -112,7 +112,7 @@ public class EmailSenderImpl implements EmailSender {
 
     private static void setProperties() {
         props = new Properties();
-        props.put("mail.smtp.host", "mail.usualsystem.com.br");
+        props.put("mail.smtp.host", "SMTP HOST");
         props.put("mail.smtp.socketFactory.port", "587");
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.auth", "true");
